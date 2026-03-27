@@ -1,26 +1,19 @@
-
 import Header from './Header';
 import Hero from './Hero';
-import Filter from './Filter';
+import BrandsSection from './BrandsSection';
 import CarCollection from './CarCollection';
 import HowItWorks from './HowItWorks';
-import Services from './Services';
-import Testimonial from './Testimonial';
 import Footer from './Footer';
 
-const LandingPage = () => {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-deepBlack text-white selection:bg-gold selection:text-deepBlack">
+    <div className="min-h-screen flex flex-col font-sans">
       <Header />
       <Hero />
-      <Filter />
+      <BrandsSection />
       <CarCollection />
       <HowItWorks />
-      <Services />
-      <Testimonial />
       <Footer />
     </div>
   );
-};
-
-export default LandingPage;
+}

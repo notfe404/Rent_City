@@ -1,81 +1,62 @@
-
-import { Award, CreditCard, Smartphone } from 'lucide-react';
-
-const services = [
+const SERVICES = [
   {
-    icon: <Award className="w-10 h-10 text-gold" />,
-    title: 'Quality Choice',
-    description: 'Our fleet is meticulously maintained and features only the highest trim levels of luxury and sports cars from top brands worldwide.'
+    title: 'Airport transfers',
+    desc: 'With additional wait time and flight tracking in case of delays, our service is optimized to make every airport transfer a breeze.',
+    img: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
   },
   {
-    icon: <CreditCard className="w-10 h-10 text-gold" />,
-    title: 'Affordable Prices',
-    description: 'We offer competitive and transparent pricing with no hidden fees, ensuring you get the best value for your luxury experience.'
+    title: 'Intercity trips',
+    desc: 'Your stressfree solution for traveling between cities with chauffeurs all over the world.',
+    img: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80',
   },
   {
-    icon: <Smartphone className="w-10 h-10 text-gold" />,
-    title: 'Convenient Online Booking',
-    description: 'Our digital platform allows you to book your dream car in minutes, with instant confirmation and seamless digital verification.'
-  }
+    title: 'Wedding events',
+    desc: 'Our friendly, and attentive service combined with thorough attention to detail ensure you can truly relax and enjoy your special day.',
+    img: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    title: 'Business Meeting',
+    desc: 'Focus on your meeting with your partners, forget about the road and the car, which will distract your thoughts.',
+    img: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?auto=format&fit=crop&w=600&q=80',
+  },
 ];
 
-const Services = () => {
+export default function Services() {
   return (
-    <section className="py-24 bg-deepBlack border-t border-white/5" id="services">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-16 items-center">
-          
-          {/* Image Side */}
-          <div className="w-full lg:w-1/2 relative group">
-            <div className="absolute inset-0 bg-gold/20 rounded-3xl -rotate-3 transition-transform duration-500 group-hover:-rotate-6" />
-            <img 
-              src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&q=80&w=1000" 
-              alt="Services and Benefits" 
-              className="relative w-full h-[500px] object-cover rounded-3xl shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
-            />
-            <div className="absolute bottom-8 -right-8 bg-graphite p-6 rounded-2xl border border-white/10 shadow-2xl hidden md:flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/[0.03] rounded-full flex items-center justify-center border border-white/10">
-                <span className="text-2xl font-black text-gold">10+</span>
-              </div>
-              <div>
-                <p className="text-white font-bold leading-tight">Years of<br/>Experience</p>
-              </div>
-            </div>
-          </div>
+    <section id="services" className="py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Content Side */}
-          <div className="w-full lg:w-1/2 space-y-12">
-            <div>
-              <span className="text-gold font-semibold tracking-wider uppercase text-sm mb-3 block">Why Choose Us</span>
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                Premium <span className="luxury-gradient-text">Services</span> & Benefits
-              </h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
-                We go above and beyond to provide an exceptional car rental experience, combining premium vehicles with unparalleled customer service.
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              {services.map((service, index) => (
-                <div key={index} className="flex gap-6 group">
-                  <div className="flex-shrink-0 w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center transition-all duration-300 group-hover:bg-gold/10 group-hover:border-gold/30">
-                    {service.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-gold transition-colors">{service.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <h2 className="text-3xl md:text-3xl font-black text-black tracking-tight">Services</h2>
+          <p className="text-gray-500 text-[13px] md:text-right font-medium max-w-sm leading-relaxed">
+            We invite you to try our services, and we personally guarantee that you will be completely satisfied.
+          </p>
         </div>
+
+        {/* Grid 2x2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {SERVICES.map((s, i) => (
+            <div key={i} className="bg-[#f8f9fa] rounded-3xl p-5 flex flex-col sm:flex-row gap-6 hover:shadow-sm transition-shadow">
+              <img
+                src={s.img}
+                alt={s.title}
+                className="w-full sm:w-[220px] h-[220px] object-cover rounded-[1.5rem] flex-shrink-0"
+              />
+              <div className="flex flex-col justify-center py-2 pr-2">
+                <h3 className="font-bold text-black text-[17px] mb-3">{s.title}</h3>
+                <p className="text-gray-500 text-[12px] leading-relaxed mb-6 font-medium">{s.desc}</p>
+                <div>
+                  <button className="bg-black hover:bg-gray-800 text-white text-[11px] font-bold px-7 py-3 rounded-xl transition-colors">
+                    Read More
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
       </div>
     </section>
   );
-};
-
-export default Services;
+}

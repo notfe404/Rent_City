@@ -1,55 +1,68 @@
+import { Check } from 'lucide-react';
 
-import { Star, Quote } from 'lucide-react';
+const FEATURES = [
+  'For upto 6 Passengers',
+  'Tinted Windows',
+  'Incredible Sound System',
+  'Drinks With Premium Rate',
+  'Fiber Optic Lights',
+  'Multipurpose Designer Limo',
+  'Bar Area With Fridge',
+  'DVD 4k Infotainment',
+];
 
-const Testimonial = () => {
+export default function Testimonial() {
   return (
-    <section className="py-24 bg-graphite relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-1/2 left-0 w-64 h-64 bg-electricBlue/5 blur-[100px] rounded-full pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gold/5 blur-[150px] rounded-full pointer-events-none" />
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-gold font-semibold tracking-wider uppercase text-sm mb-3 block">Testimonials</span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            What Our <span className="luxury-gradient-text">Clients Say</span>
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            Only today $75/day
           </h2>
+          <p className="text-gray-500 text-sm md:text-base max-w-lg mx-auto font-medium">
+            Take advantage of our hot offers, saving a significant amount when renting a limousine.
+          </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-deepBlack border border-white/10 rounded-3xl p-8 md:p-12 relative shadow-2xl overflow-hidden group hover:border-gold/30 transition-all duration-500">
-            <Quote className="absolute -top-6 -left-6 w-32 h-32 text-white/[0.02] -rotate-12 group-hover:-rotate-0 transition-transform duration-700" />
+        {/* Offer Card */}
+        <div className="bg-[#EEF1F6] rounded-[2.5rem] flex flex-col lg:flex-row overflow-hidden">
+          
+          {/* Left: Info */}
+          <div className="p-8 md:p-12 lg:p-16 lg:w-1/2 flex flex-col justify-center">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8">Cadillac Escalade</h3>
             
-            <div className="relative z-10">
-              <div className="flex gap-1 mb-8">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-6 h-6 fill-gold text-gold" />
-                ))}
-              </div>
-              
-              <blockquote className="text-xl md:text-3xl text-gray-300 font-medium leading-relaxed mb-10 italic">
-                "The experience with LUXEDRIVE was absolutely phenomenal. The Mercedes-Benz S-Class was in pristine condition, the booking process took just a few minutes, and the customer service made me feel like VIP from start to finish. Highly recommended!"
-              </blockquote>
-              
-              <div className="flex items-center gap-5">
-                <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150" 
-                  alt="Lokman Hossain" 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gold"
-                />
-                <div>
-                  <div className="font-bold text-lg text-white">Lokman Hossain</div>
-                  <div className="text-gray-400 text-sm">Texas, United States</div>
-                </div>
-              </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-2 mb-10">
+              {FEATURES.map((f, i) => (
+                <li key={i} className="flex items-center gap-3 text-sm text-gray-600 font-medium">
+                  <div className="w-4 h-4 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+                    <Check size={10} className="text-white" strokeWidth={3} />
+                  </div>
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <div>
+              <button className="bg-gray-900 hover:bg-black text-white text-sm font-bold px-8 py-3.5 rounded-xl transition-colors">
+                Reserve Now
+              </button>
             </div>
           </div>
+
+          {/* Right: Car Image */}
+          <div className="lg:w-1/2 relative min-h-[300px]">
+            <img
+              src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=80"
+              alt="Cadillac Escalade"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+
         </div>
 
       </div>
     </section>
   );
-};
-
-export default Testimonial;
+}

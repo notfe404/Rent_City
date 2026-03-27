@@ -1,103 +1,153 @@
+import { useState } from 'react';
+import { MapPin, Calendar, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-import { Calendar, MapPin, Search } from 'lucide-react';
+export default function Hero() {
+  const navigate = useNavigate();
+  
+  // Auto-fill logic
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0]; // yyyy-mm-dd
+  const futureDate = new Date();
+  futureDate.setDate(now.getDate() + 3);
+  const futureStr = futureDate.toISOString().split('T')[0];
 
-const Hero = () => {
+  // Round to nearest hour for default time
+  const currentHour = now.getHours();
+  const defaultTime = `${(currentHour + 1) % 12 || 12}:00 ${currentHour + 1 >= 12 ? 'PM' : 'AM'}`;
+
+  const [pickup, setPickup] = useState('New York, location');
+  const [dropoff, setDropoff] = useState('New York, location');
+  const [pickupDate, setPickupDate] = useState(todayStr);
+  const [pickupTime, setPickupTime] = useState(defaultTime);
+  const [returnDate, setReturnDate] = useState(futureStr);
+  const [returnTime, setReturnTime] = useState(defaultTime);
+
   return (
-    <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-      {/* Background elements */}
+    <section className="relative w-full bg-[#111111] pt-32 pb-64 flex flex-col items-center overflow-visible z-10">
+      
+      {/* Background Image Full */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-deepBlack/80 via-deepBlack/50 to-deepBlack z-10" />
         <img 
-          src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80" 
+          src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1920&auto=format&fit=crop" 
           alt="Luxury Car Background" 
-          className="w-full h-full object-cover object-center opacity-40 scale-105"
+          className="w-full h-full object-cover"
         />
-        {/* Glow effect */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/20 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-electricBlue/10 rounded-full blur-[120px] mix-blend-screen" />
+        {/* Dark overlay to make text readable */}
+        <div className="absolute inset-0 bg-black/60 sm:bg-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent"></div>
       </div>
 
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-4xl mx-auto mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
-            Discover the world on wheels with our <span className="luxury-gradient-text">car rental</span> service
-          </h1>
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
-            Experience the thrill of driving the world's most prestigious vehicles. Premium fleet, seamless booking, unforgettable journeys.
-          </p>
-        </div>
+      {/* Slogan */}
+      <h1 className="relative text-white text-4xl md:text-5xl lg:text-[54px] font-black text-center leading-[1.2] tracking-tight mb-8 px-4 z-10 pt-16">
+        Discover the world on wheels<br className="hidden md:block"/>
+        with our car rental service
+      </h1>
 
-        {/* Booking Widget */}
-        <div className="max-w-5xl mx-auto">
-          <div className="glassmorphism rounded-2xl p-4 md:p-6 shadow-2xl">
-            <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Pick-up Location</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MapPin size={18} className="text-gold" />
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="City, Airport, or Address" 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+      {/* Search Bar - Overlapping the bottom edge */}
+      <div className="absolute bottom-0 translate-y-1/2 w-full max-w-6xl px-4 z-20">
+        <div className="bg-white rounded-[2.5rem] p-5 shadow-[0_25px_60px_rgb(0,0,0,0.18)] border border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 items-end">
+            
+            {/* Pickup */}
+            <div className="lg:col-span-3 w-full group">
+              <label className="text-[11px] font-bold text-gray-500 mb-1.5 block px-4 uppercase tracking-[0.5px]">Pick-up Location</label>
+              <div className="relative flex items-center bg-[#f8f9fa] rounded-2xl border border-transparent group-hover:border-gray-200 transition-all duration-300">
+                <MapPin className="absolute left-4 text-[#78ad44]" size={16} />
+                <input
+                  type="text"
+                  value={pickup}
+                  onChange={e => setPickup(e.target.value)}
+                  className="w-full bg-transparent border-none text-black text-[13px] font-bold rounded-2xl pl-11 pr-4 py-4.5 outline-none focus:ring-2 focus:ring-black/5"
+                />
+              </div>
+            </div>
+
+            {/* Pickup Date & Time Combined */}
+            <div className="lg:col-span-3 w-full group">
+              <label className="text-[11px] font-bold text-gray-500 mb-1.5 block px-4 uppercase tracking-[0.5px]">Pick-up date & time</label>
+              <div className="flex bg-[#f8f9fa] rounded-2xl border border-transparent group-hover:border-gray-200 transition-all duration-300 overflow-hidden">
+                <div className="flex-1 relative flex items-center">
+                  <input
+                    type="date"
+                    value={pickupDate}
+                    onChange={e => setPickupDate(e.target.value)}
+                    onClick={e => e.currentTarget.showPicker()}
+                    className="w-full bg-transparent border-none text-black text-[13px] font-bold pl-5 pr-2 py-4.5 outline-none cursor-pointer [color-scheme:light] caret-transparent select-none"
                   />
+                  <Calendar className="absolute right-2 text-gray-400 pointer-events-none" size={14} />
+                </div>
+                <div className="w-[1px] bg-gray-200 my-3"></div>
+                <div className="flex-1 relative">
+                  <select 
+                    value={pickupTime}
+                    onChange={e => setPickupTime(e.target.value)}
+                    className="w-full bg-transparent border-none text-black text-[13px] font-bold px-4 py-4.5 outline-none appearance-none cursor-pointer"
+                  >
+                    {['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Drop-off Location</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MapPin size={18} className="text-gray-500" />
-                  </div>
-                  <input 
-                    type="text" 
-                    placeholder="Same as pick-up" 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all"
+            {/* Dropoff */}
+            <div className="lg:col-span-2 w-full group">
+              <label className="text-[11px] font-bold text-gray-500 mb-1.5 block px-4 uppercase tracking-[0.5px]">Drop-off</label>
+              <div className="relative flex items-center bg-[#f8f9fa] rounded-2xl border border-transparent group-hover:border-gray-200 transition-all duration-300">
+                <MapPin className="absolute left-4 text-gray-400" size={16} />
+                <input
+                  type="text"
+                  value={dropoff}
+                  onChange={e => setDropoff(e.target.value)}
+                  className="w-full bg-transparent border-none text-black text-[13px] font-bold rounded-2xl pl-11 pr-4 py-4.5 outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Dropoff Date & Time Combined */}
+            <div className="lg:col-span-3 w-full group">
+              <label className="text-[11px] font-bold text-gray-500 mb-1.5 block px-4 uppercase tracking-[0.5px]">Return date & time</label>
+              <div className="flex bg-[#f8f9fa] rounded-2xl border border-transparent group-hover:border-gray-200 transition-all duration-300 overflow-hidden">
+                <div className="flex-1 relative flex items-center">
+                  <input
+                    type="date"
+                    value={returnDate}
+                    onChange={e => setReturnDate(e.target.value)}
+                    className="w-full bg-transparent border-none text-black text-[13px] font-bold pl-5 pr-2 py-4.5 outline-none cursor-pointer [color-scheme:light]"
                   />
+                  <Calendar className="absolute right-2 text-gray-400 pointer-events-none" size={14} />
+                </div>
+                <div className="w-[1px] bg-gray-200 my-3"></div>
+                <div className="flex-1 relative">
+                  <select 
+                    value={returnTime}
+                    onChange={e => setReturnTime(e.target.value)}
+                    className="w-full bg-transparent border-none text-black text-[13px] font-bold px-4 py-4.5 outline-none appearance-none cursor-pointer"
+                  >
+                    {['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Pickup Date</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar size={18} className="text-gold" />
-                  </div>
-                  <input 
-                    type="date" 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all [&::-webkit-calendar-picker-indicator]:invert"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Drop-off Date</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar size={18} className="text-gray-500" />
-                  </div>
-                  <input 
-                    type="date" 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all [&::-webkit-calendar-picker-indicator]:invert"
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="button"
-                className="w-full bg-gold hover:bg-yellow-400 text-deepBlack font-bold rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_4px_20px_rgba(212,175,55,0.4)] hover:shadow-[0_4px_25px_rgba(212,175,55,0.6)] hover:-translate-y-0.5"
+            {/* Button */}
+            <div className="lg:col-span-1 w-full flex items-end">
+              <button
+                onClick={() => navigate('/search')}
+                className="w-full bg-black hover:bg-gray-800 text-white font-bold text-[13px] p-4.5 rounded-2xl transition-all shadow-xl hover:shadow-[#78ad44]/20 flex items-center justify-center gap-2 h-[52px]"
               >
-                <Search size={20} />
-                <span>Find a Vehicle</span>
+                 <Search size={18} />
               </button>
-            </form>
+            </div>
+
           </div>
         </div>
       </div>
+
     </section>
   );
-};
-
-export default Hero;
+}

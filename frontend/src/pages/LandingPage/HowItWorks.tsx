@@ -1,69 +1,79 @@
+import { Search, Calendar, MapPin } from 'lucide-react';
 
-import { Search, CheckCircle, Car } from 'lucide-react';
-
-const steps = [
-  {
-    icon: <Search className="w-8 h-8 text-gold" />,
-    title: 'Browse and Select',
-    description: 'Choose premium cars and dates that fit your schedule perfectly from our extensive collection.',
-    number: '01'
-  },
-  {
-    icon: <CheckCircle className="w-8 h-8 text-gold" />,
-    title: 'Book and Confirm',
-    description: 'Instant confirmation via email/SMS with detailed instructions and booking reference.',
-    number: '02'
-  },
-  {
-    icon: <Car className="w-8 h-8 text-gold" />,
-    title: 'Enjoy Your Ride',
-    description: 'Pick up your vehicle at the designated location and embark on your unforgettable journey.',
-    number: '03'
-  }
-];
-
-const HowItWorks = () => {
+export default function HowItWorks() {
   return (
-    <section className="py-24 bg-graphite relative overflow-hidden">
-      {/* Decorative background element */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gold/5 blur-[150px] mix-blend-screen rounded-full pointer-events-none" />
+    <section className="bg-white py-24 pb-32">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <span className="text-gold font-semibold tracking-wider uppercase text-sm mb-3 block">Simple Process</span>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            <span className="luxury-gradient-text">How It Works</span>
-          </h2>
-          <p className="text-gray-400 text-lg">
-            Rent your luxury vehicle in three simple steps. We've streamlined the process to get you on the road faster.
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-3xl font-black text-black mb-4 tracking-tight">How it works</h2>
+          <p className="text-black text-[13px] font-medium max-w-[650px] mx-auto leading-relaxed">
+            Renting a luxury car has never been easier. Our streamlined process makes it simple for you<br />to book and confirm your vehicle of choice online.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connector line for desktop */}
-          <div className="hidden md:block absolute top-[4.5rem] left-[15%] right-[15%] h-px bg-white/10 z-0"></div>
-
-          {steps.map((step, index) => (
-            <div key={index} className="relative z-10 flex flex-col items-center text-center group">
-              <div className="w-24 h-24 rounded-full bg-deepBlack border-2 border-white/10 flex items-center justify-center mb-8 relative transition-all duration-500 group-hover:border-gold group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                {step.icon}
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gold text-deepBlack font-black text-sm flex items-center justify-center border-4 border-graphite">
-                  {step.number}
-                </div>
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+          
+          {/* Left - Steps */}
+          <div className="w-full lg:w-[45%] flex flex-col gap-6 justify-center">
+            
+            {/* Step 1 */}
+            <div className="bg-white border rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex gap-4">
+              <div className="bg-[#f8f9fa] w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                <Search size={18} className="text-black" />
               </div>
-              
-              <h3 className="text-xl font-bold mb-4">{step.title}</h3>
-              <p className="text-gray-400 leading-relaxed max-w-sm">
-                {step.description}
-              </p>
+              <div>
+                <h3 className="font-bold text-[15px] mb-2 text-black">Browse and select</h3>
+                <p className="text-[12px] text-gray-600 font-medium leading-relaxed">
+                  Choose from our wide range of premium cars, select the<br/>pickup point and your nearest available that suit you best
+                </p>
+              </div>
             </div>
-          ))}
+
+            {/* Step 2 */}
+            <div className="bg-white border rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex gap-4">
+              <div className="bg-[#f8f9fa] w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                <Calendar size={18} className="text-black" />
+              </div>
+              <div>
+                <h3 className="font-bold text-[15px] mb-2 text-black">Book and confirm</h3>
+                <p className="text-[12px] text-gray-600 font-medium leading-relaxed">
+                  Easily book your desired car with just a few clicks and receive an<br/>instant confirmation via email or SMS
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white border rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex gap-4">
+              <div className="bg-[#f8f9fa] w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                <MapPin size={18} className="text-black" />
+              </div>
+              <div>
+                <h3 className="font-bold text-[15px] mb-2 text-black">Enjoy your ride</h3>
+                <p className="text-[12px] text-gray-600 font-medium leading-relaxed">
+                  Pick up your car at the designated location and enjoy your<br/>premium driving experience with our top quality service
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right - Image */}
+          <div className="w-full lg:w-[55%] relative flex items-center justify-end">
+            {/* Background shape */}
+            <div className="absolute right-0 top-0 bottom-0 w-[80%] bg-[#f4f5f6] rounded-[2.5rem] -z-10"></div>
+            
+            <img 
+              src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80" 
+              alt="Luxury SUV" 
+              className="w-[95%] h-auto object-cover rounded-3xl py-10 drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+
         </div>
 
       </div>
     </section>
   );
-};
-
-export default HowItWorks;
+}
