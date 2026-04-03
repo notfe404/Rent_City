@@ -1,95 +1,21 @@
-import { useState, useMemo } from 'react';
-import { Search, MapPin, Calendar, Filter, Car, Users, Settings, Briefcase, ChevronDown } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { Search, MapPin, Calendar, Filter, ChevronDown } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import Header from '../LandingPage/Header';
 import Footer from '../LandingPage/Footer';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-
-// Dummy Data
-const MOCK_VEHICLES = [
-  {
-    id: '1',
-    name: 'Mercedes-Benz S-Class',
-    brand: 'Mercedes-Benz',
-    type: 'Luxury Sedan',
-    category: 'Luxury',
-    price: 150,
-    image: 'https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=800&auto=format&fit=crop',
-    passengers: 4,
-    doors: 4,
-    transmission: 'Automatic',
-    luggage: 3,
-  },
-  {
-    id: '2',
-    name: 'Porsche Taycan',
-    brand: 'Porsche',
-    type: 'Electric Sports',
-    category: 'Sports',
-    price: 200,
-    image: 'https://images.unsplash.com/photo-1503378414167-bd1ad040c5f0?q=80&w=800&auto=format&fit=crop',
-    passengers: 4,
-    doors: 4,
-    transmission: 'Automatic',
-    luggage: 2,
-  },
-  {
-    id: '3',
-    name: 'Range Rover Velar',
-    brand: 'Land Rover',
-    type: 'Premium SUV',
-    category: 'SUV',
-    price: 180,
-    image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0b16?q=80&w=800&auto=format&fit=crop',
-    passengers: 5,
-    doors: 4,
-    transmission: 'Automatic',
-    luggage: 4,
-  },
-  {
-    id: '4',
-    name: 'BMW 4 Series Cabriolet',
-    brand: 'BMW',
-    type: 'Convertible',
-    category: 'Convertible',
-    price: 160,
-    image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=800&auto=format&fit=crop',
-    passengers: 4,
-    doors: 2,
-    transmission: 'Automatic',
-    luggage: 2,
-  },
-  {
-    id: '5',
-    name: 'Audi Q8',
-    brand: 'Audi',
-    type: 'Crossover SUV',
-    category: 'SUV',
-    price: 170,
-    image: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=800&auto=format&fit=crop',
-    passengers: 5,
-    doors: 4,
-    transmission: 'Automatic',
-    luggage: 5,
-  },
-  {
-    id: '6',
-    name: 'Toyota Camry',
-    brand: 'Toyota',
-    type: 'Sedan',
-    category: 'Sedan',
-    price: 80,
-    image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?q=80&w=800&auto=format&fit=crop',
-    passengers: 5,
-    doors: 4,
-    transmission: 'Automatic',
-    luggage: 3,
-  },
-];
+import { MOCK_VEHICLES } from '@/data/mockVehicles';
+import { VehicleCard } from '@/components/vehicle/VehicleCard';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function SearchPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
   const [priceRange, setPriceRange] = useState(300);
+  // Debounce the price to avoid heavy re-filtering while sliding
+  const debouncedPrice = useDebounce(priceRange, 300);
 
   // Auto-fill logic
   const now = new Date();
@@ -108,14 +34,24 @@ export default function SearchPage() {
   const brandFilter = searchParams.get('brand');
   const categoryFilter = searchParams.get('category');
 
+  // Filter with useMemo, depending on debounced price
   const filteredVehicles = useMemo(() => {
     return MOCK_VEHICLES.filter(car => {
       if (brandFilter && car.brand.toLowerCase() !== brandFilter.toLowerCase()) return false;
       if (categoryFilter && !car.type.toLowerCase().includes(categoryFilter.toLowerCase()) && !car.category?.toLowerCase().includes(categoryFilter.toLowerCase())) return false;
-      if (car.price > priceRange) return false;
+      if (car.price > debouncedPrice) return false;
       return true;
     });
-  }, [brandFilter, categoryFilter, priceRange]);
+  }, [brandFilter, categoryFilter, debouncedPrice]);
+
+  // Memoize event handlers so Pure Components don't re-render
+  const handleDetailsClick = useCallback((id: string) => {
+    navigate(`/vehicles/${id}`);
+  }, [navigate]);
+
+  const handleBookClick = useCallback((id: string) => {
+    navigate(`/booking/${id}`);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans">
@@ -257,7 +193,7 @@ export default function SearchPage() {
         </aside>
 
         {/* Vehicle Grid */}
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           <div className="flex justify-between items-center mb-8">
             <p className="text-gray-500 font-medium">Showing <span className="text-gray-900 font-bold">{filteredVehicles.length}</span> vehicles</p>
             <div className="flex items-center gap-2">
@@ -269,76 +205,51 @@ export default function SearchPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {filteredVehicles.map((car) => (
-              <div key={car.id} className="bg-white rounded-3xl overflow-hidden shadow-[0_2px_15px_rgb(0,0,0,0.04)] border border-gray-100/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
-                
-                {/* Car Image */}
-                <div className="relative h-56 bg-[#f4f8f7] p-6 overflow-hidden flex items-center justify-center">
-                  <img src={car.image} alt={car.name} className="w-full h-full object-cover rounded-xl mt-4 group-hover:scale-105 transition-transform duration-500 shadow-md" />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 justify-center flex items-center font-bold text-sm rounded-full text-[#78ad44] shadow-sm">
-                    ${car.price} <span className="text-gray-400 text-xs ml-1 font-medium">/ day</span>
-                  </div>
-                </div>
-
-                {/* Info Container */}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="mb-4">
-                    <p className="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">{car.type}</p>
-                    <h3 className="text-xl font-black text-gray-900 line-clamp-1">{car.name}</h3>
-                  </div>
-
-                  {/* Specs Grid */}
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6 pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-start text-xs font-semibold text-gray-600 gap-2">
-                      <Users size={16} className="text-[#78ad44]" /> {car.passengers} Passengers
-                    </div>
-                    <div className="flex items-center justify-start text-xs font-semibold text-gray-600 gap-2">
-                      <Briefcase size={16} className="text-[#78ad44]" /> {car.luggage} Baggage
-                    </div>
-                    <div className="flex items-center justify-start text-xs font-semibold text-gray-600 gap-2">
-                      <Car size={16} className="text-[#78ad44]" /> {car.doors} Doors
-                    </div>
-                    <div className="flex items-center justify-start text-xs font-semibold text-gray-600 gap-2">
-                      <Settings size={16} className="text-[#78ad44]" /> {car.transmission}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-auto flex gap-3">
-                    <button 
-                      onClick={() => navigate(`/vehicles/${car.id}`)}
-                      className="flex-1 bg-white border-2 border-gray-200 text-gray-700 py-3 rounded-full font-bold text-sm tracking-wide hover:border-[#78ad44] hover:text-[#78ad44] transition-colors"
-                    >
-                      Details
-                    </button>
-                    <button 
-                      onClick={() => navigate(`/booking/${car.id}`)}
-                      className="flex-1 bg-[#212529] text-white py-3 rounded-full font-bold text-sm tracking-wide hover:bg-[#78ad44] transition-colors shadow-lg"
-                    >
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-            ))}
+            <AnimatePresence mode="popLayout">
+              {filteredVehicles.map((car) => (
+                <motion.div
+                  key={car.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <VehicleCard 
+                    car={car} 
+                    onDetailsClick={handleDetailsClick} 
+                    onBookClick={handleBookClick} 
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
-          {filteredVehicles.length === 0 && (
-             <div className="bg-white rounded-[2rem] p-12 text-center shadow-sm border border-gray-100">
-                <div className="w-20 h-20 bg-[#f4f8f7] rounded-full flex items-center justify-center mx-auto mb-6 text-[#78ad44]">
-                  <Search size={40} />
-                </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-2">No vehicles found</h3>
-                <p className="text-gray-500 mb-8 max-w-sm mx-auto">We couldn't find any vehicles matching your current filters. Try adjusting your search or clearing filters.</p>
-                <button 
-                  onClick={() => navigate('/search')}
-                  className="bg-[#78ad44] text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-[#78ad44]/20"
-                >
-                  Clear All Filters
-                </button>
-             </div>
-          )}
+          <AnimatePresence>
+            {filteredVehicles.length === 0 && (
+               <motion.div 
+                 initial={{ opacity: 0, scale: 0.9 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.9 }}
+                 className="bg-white rounded-[2rem] p-12 text-center shadow-sm border border-gray-100 mt-8"
+               >
+                  <div className="w-20 h-20 bg-[#f4f8f7] rounded-full flex items-center justify-center mx-auto mb-6 text-[#78ad44]">
+                    <Search size={40} />
+                  </div>
+                  <h3 className="text-2xl font-black text-gray-900 mb-2">No vehicles found</h3>
+                  <p className="text-gray-500 mb-8 max-w-sm mx-auto">We couldn't find any vehicles matching your current filters. Try adjusting your search or clearing filters.</p>
+                  <button 
+                    onClick={() => {
+                      setPriceRange(500);
+                      navigate('/search');
+                    }}
+                    className="bg-[#78ad44] text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-[#78ad44]/20"
+                  >
+                    Clear All Filters
+                  </button>
+               </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Pagination (Dummy) */}
           {filteredVehicles.length > 0 && (

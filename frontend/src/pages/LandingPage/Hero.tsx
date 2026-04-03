@@ -115,7 +115,8 @@ export default function Hero() {
                     type="date"
                     value={returnDate}
                     onChange={e => setReturnDate(e.target.value)}
-                    className="w-full bg-transparent border-none text-black text-[13px] font-bold pl-5 pr-2 py-4.5 outline-none cursor-pointer [color-scheme:light]"
+                    onClick={e => e.currentTarget.showPicker()}
+                    className="w-full bg-transparent border-none text-black text-[13px] font-bold pl-5 pr-2 py-4.5 outline-none cursor-pointer [color-scheme:light] caret-transparent select-none"
                   />
                   <Calendar className="absolute right-2 text-gray-400 pointer-events-none" size={14} />
                 </div>
