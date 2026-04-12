@@ -56,15 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (credentials: LoginRequest) => {
     // ── MOCK LOGIN (for local development) ──────────────────
-    const mockUser = MOCK_USERS[credentials.email];
-    if (mockUser && mockUser.password === credentials.password) {
-      const { password: _, ...user } = mockUser;
-      localStorage.setItem('accessToken', 'mock-token-' + user.role);
-      localStorage.setItem('mockUser', JSON.stringify(user));
-      setUser(user);
-      closeAuthModal();
-      return;
-    }
+    // const mockUser = MOCK_USERS[credentials.email];
+    // if (mockUser && mockUser.password === credentials.password) {
+    //   const { password: _, ...user } = mockUser;
+    //   localStorage.setItem('accessToken', 'mock-token-' + user.role);
+    //   localStorage.setItem('mockUser', JSON.stringify(user));
+    //   setUser(user);
+    //   closeAuthModal();
+    //   return;
+    // }
     // ── REAL API ─────────────────────────────────────────────
     const { data } = await api.post<AuthResponse>('/auth/login', credentials);
     localStorage.setItem('accessToken', data.accessToken);
@@ -74,33 +74,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (info: RegisterRequest) => {
-    // Mock register — luôn tạo CUSTOMER account
-    if (import.meta.env.DEV) {
-      const fakeUser: User = {
-        id: 'u-' + Date.now(),
-        email: info.email,
-        fullName: info.fullName,
-        phone: info.phone ?? '',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
-        loyaltyPoints: 0,
-        tier: 'STANDARD',
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(info.fullName)}&background=78ad44&color=fff`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      localStorage.setItem('accessToken', 'mock-token-CUSTOMER');
-      localStorage.setItem('mockUser', JSON.stringify(fakeUser));
-      setUser(fakeUser);
-      closeAuthModal();
-      return;
-    }
-    const { data } = await api.post<AuthResponse>('/auth/register', info);
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    setUser(data.user);
-    closeAuthModal();
-  };
+  const { data } = await api.post<AuthResponse>('/auth/register', info);
+
+  localStorage.setItem('accessToken', data.accessToken);
+  localStorage.setItem('refreshToken', data.refreshToken);
+
+  setUser(data.user); // if you add user later
+  closeAuthModal();
+};
 
   const logout = async () => {
     try {

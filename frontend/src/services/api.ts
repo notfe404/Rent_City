@@ -14,16 +14,13 @@ const api = axios.create({
 });
 
 // ---- Request Interceptor: tự động gắn JWT Access Token ----
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // ---- Response Interceptor: tự động refresh token khi 401 ----
 let isRefreshing = false;
@@ -66,7 +63,7 @@ api.interceptors.response.use(
           `${api.defaults.baseURL}/auth/refresh`,
           { refreshToken }
         );
-
+        
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
 

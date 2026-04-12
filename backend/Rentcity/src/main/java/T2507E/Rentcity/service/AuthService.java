@@ -31,18 +31,32 @@ public class AuthService {
     @Autowired
     private JwtUtil jwt;
 
-    public String register(RegisterRequest r) {
+    public LoginResponse register(RegisterRequest r) {
         User u = new User();
         u.setId(UUID.randomUUID());
         u.setEmail(r.getEmail());
         u.setPasswordHash(PasswordUtil.hash(r.getPassword()));
-        u.setFullName(r.getFullName());  // ✅
-        u.setPhone(r.getPhone());        // ✅
+        u.setFullName(r.getFullName());
+        u.setPhone(r.getPhone());
         u.setRole(UserRole.CUSTOMER);
         u.setStatus(UserStatus.ACTIVE);
 
         repo.save(u);
-        return "REGISTERED";
+
+        String accessToken = jwt.generate(u.getId(), u.getRole().name());
+
+        String rawRefresh = UUID.randomUUID().toString();
+
+        RefreshToken rt = new RefreshToken();
+        rt.setId(UUID.randomUUID());
+        rt.setUserId(u.getId());
+        rt.setTokenHash(PasswordUtil.hash(rawRefresh));
+        rt.setExpiresAt(Instant.now().plusSeconds(7 * 24 * 3600));
+        rt.setRevoked(false);
+
+        refreshRepo.save(rt);
+
+        return new LoginResponse(accessToken, rawRefresh, u);
     }
     public LoginResponse login(LoginRequest r) {
         User u = repo.findByEmail(r.getEmail()).orElseThrow();
@@ -64,7 +78,7 @@ public class AuthService {
 
         refreshRepo.save(rt);
 
-        return new LoginResponse(accessToken, rawRefresh);
+        return new LoginResponse(accessToken, rawRefresh, u);
     }
 
     public RefreshResponse refresh(String refreshToken) {
@@ -97,5 +111,18 @@ public class AuthService {
                 refreshRepo.save(t);
             }
         }
+    }
+
+    public User getCurrentUser(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("No token");
+        }
+
+        String token = authHeader.substring(7);
+
+        UUID userId = jwt.extractUserId(token);
+
+        return repo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

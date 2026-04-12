@@ -5,10 +5,14 @@ import { Save, Upload, X, FileText, Check, Edit3 } from 'lucide-react';
 import CustomerSidebar from '@/components/layout/CustomerSidebar';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { getMe } from '@/services/userApi';
+import { uploadDocument } from '@/services/userApi';
+import { updateProfile } from '@/services/userApi';
+import { getMyDocuments } from '@/services/userApi';
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  
+  const [documents, setDocuments] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
 
   // Local state for displaying & editing
@@ -22,35 +26,78 @@ export default function ProfilePage() {
   const [postal, setPostal] = useState('10001');
 
   // CCCD States
-  const [frontId, setFrontId] = useState<{ url: string; isPdf: boolean } | null>(null);
-  const [backId, setBackId] = useState<{ url: string; isPdf: boolean } | null>(null);
+  const [frontId, setFrontId] = useState<{
+  file?: File;
+  url: string;
+  isPdf: boolean;
+} | null>(null);
+
+const [backId, setBackId] = useState<{
+  file?: File;
+  url: string;
+  isPdf: boolean;
+} | null>(null);
   
   const frontInputRef = useRef<HTMLInputElement>(null);
   const backInputRef = useRef<HTMLInputElement>(null);
 
   // Sync with auth cache
   useEffect(() => {
-    if (user) {
-      const parts = user.fullName.split(' ');
+  const fetchUser = async () => {
+    try {
+      const { data } = await getMe();
+
+      const parts = data.fullName.split(' ');
       setFirstName(parts[0] || '');
       setLastName(parts.slice(1).join(' ') || '');
-      setEmail(user.email);
-      if (user.phone) setPhone(user.phone);
+      setEmail(data.email);
+      setPhone(data.phone || '');
+
+      // 👉 GET DOCUMENTS
+      const docRes = await getMyDocuments();
+      setDocuments(docRes.data);
+
+      if (docRes.data.length > 0) {
+        const doc = docRes.data[0];
+
+        setFrontId({
+          url: doc.frontUrl,
+          isPdf: doc.frontUrl.endsWith('.pdf'),
+        });
+
+        setBackId({
+          url: doc.backUrl,
+          isPdf: doc.backUrl.endsWith('.pdf'),
+        });
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load user data');
     }
-  }, [user]);
+  };
+
+  fetchUser();
+}, []);
 
   const handleFileUpload = (type: 'front' | 'back', e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size exceeds 5MB limit.');
-      return;
-    }
-    const isPdf = file.type === 'application/pdf';
-    const url = URL.createObjectURL(file);
-    if (type === 'front') setFrontId({ url, isPdf });
-    else setBackId({ url, isPdf });
-  };
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error('File too large');
+    return;
+  }
+
+  const isPdf = file.type === 'application/pdf';
+  const url = URL.createObjectURL(file);
+
+  if (type === 'front') {
+    setFrontId({ file, url, isPdf });
+  } else {
+    setBackId({ file, url, isPdf });
+  }
+};
 
   const removeFile = (type: 'front' | 'back', e: React.MouseEvent) => {
     e.stopPropagation();
@@ -65,10 +112,50 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSave = () => {
-    toast.success('Your profile has been updated successfully! ✨');
+  const handleSave = async () => {
+  try {
+    // Update profile
+    await updateProfile({
+      fullName: `${firstName} ${lastName}`,
+      phone,
+    });
+
+    // Upload ONLY if new files selected
+    if (frontId?.file && backId?.file) {
+      const formData = new FormData();
+
+      formData.append('docType', 'CCCD');
+      formData.append('docNumber', '123456789');
+      formData.append('frontFile', frontId.file);
+      formData.append('backFile', backId.file);
+
+      await uploadDocument(formData);
+
+      // reload docs
+      const docRes = await getMyDocuments();
+      setDocuments(docRes.data);
+
+      const doc = docRes.data[0];
+
+      setFrontId({
+        url: doc.frontUrl,
+        isPdf: doc.frontUrl.includes('.pdf'),
+      });
+
+      setBackId({
+        url: doc.backUrl,
+        isPdf: doc.backUrl.includes('.pdf'),
+      });
+    }
+
+    toast.success('Profile updated & document uploaded!');
     setIsEditing(false);
-  };
+
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to save profile');
+  }
+};
 
   const handleCancel = () => {
     // Reset or ignore
